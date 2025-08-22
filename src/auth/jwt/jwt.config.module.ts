@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './jwt.strategy';
+import { RedisModule } from 'src/redis/redis.module';
 
 @Module({
   imports: [
@@ -10,6 +11,7 @@ import { JwtStrategy } from './jwt.strategy';
         signOptions: { expiresIn: '2h' },
       }),
     }),
+    RedisModule,
   ],
   exports: [JwtModule],
   providers: [JwtStrategy],

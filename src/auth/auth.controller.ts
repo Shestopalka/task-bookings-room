@@ -10,8 +10,6 @@ export class AuthController {
 
   @Post('/registration')
   async registration(@Body() dto: RegistrationDto) {
-    console.log('lalalalal');
-
     return await this.authService.registartion(dto);
   }
 

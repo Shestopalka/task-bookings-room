@@ -5,15 +5,17 @@ import { AuthModule } from './auth/auth.module';
 import { UserModule } from './users/user.module'; // правильніше імпортувати модуль, а не сервіс
 import { PrismaModule } from 'prisma/prisma.module';
 import { JwtConfigModule } from './auth/jwt/jwt.config.module';
+import { RedisModule } from '@nestjs-modules/ioredis';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    RedisModule,
     BookingsModule,
     AuthModule,
-    UserModule, // <-- імпортуємо модуль, а не сервіс
+    UserModule,
     PrismaModule,
-    JwtConfigModule, // глобальний модуль Prisma
+    JwtConfigModule,
   ],
   controllers: [],
   providers: [],

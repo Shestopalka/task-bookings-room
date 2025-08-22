@@ -29,12 +29,16 @@ CREATE TABLE "public"."Booking" (
     "endTime" TIMESTAMP(3) NOT NULL,
     "userId" INTEGER NOT NULL,
     "roomId" INTEGER NOT NULL,
+    "deletedAt" TIMESTAMP(3),
 
     CONSTRAINT "Booking_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "public"."User"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Booking_userId_roomId_startTime_endTime_key" ON "public"."Booking"("userId", "roomId", "startTime", "endTime");
 
 -- AddForeignKey
 ALTER TABLE "public"."Booking" ADD CONSTRAINT "Booking_userId_fkey" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

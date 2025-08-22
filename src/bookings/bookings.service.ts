@@ -42,13 +42,33 @@ export class BookingsService {
       throw new ForbiddenException('Room already booked for this period');
     }
 
-    return this.prisma.booking.create({
-      data: {
-        startTime: dto.start_time,
-        endTime: dto.end_time,
-        roomId: dto.room_id,
-        userId: dto.user_id,
-      },
+    return this.prisma.$transaction(async (tx) => {
+      await tx.$executeRawUnsafe(
+        `SELECT id FROM "Room" WHERE id = $1 FOR UPDATE`,
+        dto.room_id,
+      );
+
+      const overlap = await tx.booking.findFirst({
+        where: {
+          roomId: dto.room_id,
+          deletedAt: null,
+          startTime: { lt: dto.end_time },
+          endTime: { gt: dto.start_time },
+        },
+      });
+
+      if (overlap) {
+        throw new Error('Room already booked for this time');
+      }
+
+      return tx.booking.create({
+        data: {
+          userId: dto.user_id,
+          roomId: dto.room_id,
+          startTime: dto.start_time,
+          endTime: dto.end_time,
+        },
+      });
     });
   }
 
@@ -93,8 +113,9 @@ export class BookingsService {
       }
     }
 
-    return this.prisma.booking.delete({
+    return this.prisma.booking.update({
       where: { id: bookingsId },
+      data: { deletedAt: new Date() },
     });
   }
 

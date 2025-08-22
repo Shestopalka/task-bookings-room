@@ -8,6 +8,7 @@ import { LoginDto } from './dto/login.dto';
 import { LoginHandler } from 'src/handlers/login.handler';
 import { ConfigService } from '@nestjs/config';
 import { AdminDto } from 'src/bookings/dto/addAdmin-role.dto';
+import { RedisService } from 'src/redis/redis.service';
 
 @Injectable()
 export class AuthService {
@@ -17,22 +18,22 @@ export class AuthService {
     private readonly getJwtToken: GetJwtToken,
     private readonly loginHadnler: LoginHandler,
     private readonly config: ConfigService,
+    private readonly redisService: RedisService,
   ) {}
 
   async registartion(dto: RegistrationDto) {
     try {
-      console.log('service lalalalal');
       await this.regHandler.handle(dto);
 
       const user = await this.userService.create(dto);
-      const acces_token = await this.getJwtToken.handle({
+      const access_token = await this.getJwtToken.handle({
         userId: user.id,
         email: user.email,
         role: user.role,
       });
-      console.log('LALALALALA');
+      await this.redisService.setToken(user.id.toString(), access_token, 3600);
 
-      return { acces_token };
+      return { access_token };
     } catch (err) {
       throw err;
     }
@@ -47,6 +48,8 @@ export class AuthService {
         email: dto.email,
         role: user.role,
       });
+      await this.redisService.setToken(userId.toString(), access_token, 3600);
+
       return { access_token };
     } catch (err) {
       throw err;

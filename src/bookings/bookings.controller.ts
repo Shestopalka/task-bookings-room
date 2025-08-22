@@ -42,7 +42,6 @@ export class BookingsController {
     return await this.bookingsService.getAvailable(params);
   }
 
-  //джпт для цього ендпоінта хоче айдішник і роль, достанеш собі і передаш
   @Delete('/bookings/:id')
   async deleteBookings(
     @GetUser() user: PayloadDto,
@@ -54,8 +53,7 @@ export class BookingsController {
       user.role,
     );
   }
-  @Roles('admin')
-  @UseGuards(RoleGuard)
+
   @Get('/users/:id/bookings')
   async getUserBookings(
     @GetUser() user: PayloadDto,
